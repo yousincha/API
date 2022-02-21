@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+ 
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>책 검색 사이트</title>
+    <style>
+       #query {   
+                width: 300px;
+                height: 50px;
+                border-top: none;
+                border-left: none;
+                border-right: none;
+                border-bottom: 3px solid black;
+        }
+        #search {
+                width: 100px;
+                height: 55px;
+                border-top: none;
+                border-left: none;
+                border-right: none;
+                border-bottom: 3px solid black;
+
+
+        }
+
+    </style>
+</head>
+ 
+<body>
+ <img src="../book.png" width="70dx" height="70dx" style="margin-left: auto; margin-right: auto; display: block;"/>
+ <p style="text-align: center;">
+    <input id="query" type="text" >
+    <button id="search">검색</button>
+</p>
+  <div></div>
+    <script
+    src="https://code.jquery.com/jquery-3.6.0.js"
+    integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+    crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function () {
+            var pageNum = 1;
+ 
+            $("#search").click(function () {
+                $("div").html("");
+ 
+                $.ajax({
+                    method: "GET",
+                    url: "https://dapi.kakao.com/v3/search/book?target=title",
+                    data: { query: $("#query").val(), page: pageNum},
+                    headers: {Authorization: "KakaoAK 3c904317a5568f0098f3304a65c750ca"}
+ 
+                })
+                .done(function (msg) {
+                    console.log(msg);
+                    for (var i = 0; i < 10; i++){
+                        $("div").append("<h3><a href='"+ msg.documents[i].url +"'>" + msg.documents[i].title + "</a></h3>");
+                        $("div").append("<img src='" + msg.documents[i].thumbnail + "'/><br>");
+                        $("div").append("<strong>저자:</strong> " + msg.documents[i].authors + "<br>");
+                        $("div").append("<strong>출판사:</strong> " + msg.documents[i].publisher + "<br>");
+                        $("div").append("<strong>요약:</strong> " + msg.documents[i].contents + "...<br>");
+                        $("div").append("---------------------------------------------------");
+                    }
+                });
+            })
+ 
+            $(window).scroll(function(){  
+ 
+                if ( Math.ceil($(window).scrollTop()) + $(window).height() >= $(document).height() ){
+                    pageNum++;
+ 
+ 
+                    $.ajax({
+                        method: "GET",
+                        url: "https://dapi.kakao.com/v3/search/book?target=title",
+                        data: { query: $("#query").val(),  page: pageNum},
+                        headers: {Authorization: "KakaoAK 3c904317a5568f0098f3304a65c750ca"} // ########부분에 본인의 REST API 키를 넣어주세요.
+ 
+                    })
+                    .done(function (msg) {
+                        console.log(msg);
+                        for (var i = 0; i < 10; i++){
+                            $("div").append("<h3><a href='"+ msg.documents[i].url +"'>" + msg.documents[i].title + "</a></h3>");
+                            $("div").append("<img src='" + msg.documents[i].thumbnail + "'/><br>");
+                            $("div").append("<strong>저자:</strong> " + msg.documents[i].authors + "<br>");
+                            $("div").append("<strong>출판사:</strong> " + msg.documents[i].publisher + "<br>");
+                            $("div").append("<strong>요약:</strong> " + msg.documents[i].contents + "...<br>");
+                            $("div").append("---------------------------------------------------");
+
+                        }
+                    });
+                }
+                
+            });
+        })
+ 
+        
+    </script>
+</body>
+ 
+</html>
